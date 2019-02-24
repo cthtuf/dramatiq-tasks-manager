@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='dramatiq-tasks-manager',
-    version='0.0.1',
+    version='0.0.3',
     packages=['dramatiq_tasks_manager', 'dramatiq_tasks_manager.management',
               'dramatiq_tasks_manager.management.commands'],
     url='https://github.com/cthtuf/dramatiq-tasks-manager',

@@ -1,11 +1,9 @@
 from rest_framework import serializers
 
 from django_dramatiq.models import Task
-from dramatiq.broker import get_broker
-from dramatiq.errors import ActorNotFound
 
 from .scheduler import Scheduler
-from .utils import get_actor_apschedulerpath_by_name, get_declared_actors
+from .utils import get_actor_apschedulerpath_by_name, get_declared_actors, getactor_by_name
 
 
 class ExecuteTaskSerializer(serializers.Serializer):
@@ -20,15 +18,18 @@ class ExecuteTaskSerializer(serializers.Serializer):
         return value
 
     def create(self, validated_data):
+        """
+        This method enqueue actor to execution
+        :param validated_data:
+        :return:
+        """
         actor_name = validated_data.get('actor_name')
         kwargs = validated_data.get('kwargs', {})
-        try:
-            job = get_broker().get_actor(actor_name).send(**kwargs)
-            return job
-        except ActorNotFound as anf:
-            raise serializers.ValidationError(f"Actor '{anf}' not found")
-        except Exception as e:
-            raise serializers.ValidationError(e)
+        actor = getactor_by_name(actor_name)
+        if not actor:
+            raise serializers.ValidationError(f"Can't get actor by given name. "
+                                              f"Check that actor_name is in the list {get_declared_actors()}")
+        return actor.send(**kwargs)
 
 
 class TaskListSerializer(serializers.ModelSerializer):
@@ -57,7 +58,6 @@ class ScheduleJobSerializer(serializers.Serializer):
     AVAILABLE_TRIGGERS = (TRIGGER_DATE, TRIGGER_INTERVAL, TRIGGER_CRON, )
 
     func = serializers.CharField()
-
     args = serializers.ListField(default=None)
     kwargs = serializers.DictField(default=None)
     name = serializers.CharField(default=None)
@@ -65,11 +65,8 @@ class ScheduleJobSerializer(serializers.Serializer):
     coalesce = serializers.BooleanField(default=None)
     max_instances = serializers.IntegerField(default=1, min_value=1)
     replace_existing = serializers.BooleanField(default=False)
-    # ToDo: Add timezone support
-
     id = serializers.CharField(default=None, required=False)
     executor = serializers.CharField(default='default')
-
     next_run_time = serializers.DateTimeField(read_only=True)
 
     def validate_func(self, value):
