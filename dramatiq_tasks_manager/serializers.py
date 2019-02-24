@@ -57,10 +57,9 @@ class ScheduleJobSerializer(serializers.Serializer):
     TRIGGER_CRON = 'cron'
     AVAILABLE_TRIGGERS = (TRIGGER_DATE, TRIGGER_INTERVAL, TRIGGER_CRON, )
 
-    func = serializers.CharField()
+    actor_name = serializers.CharField(source='func')
     args = serializers.ListField(default=None)
     kwargs = serializers.DictField(default=None)
-    name = serializers.CharField(default=None)
     misfire_grace_time = serializers.IntegerField(default=None)
     coalesce = serializers.BooleanField(default=None)
     max_instances = serializers.IntegerField(default=1, min_value=1)
@@ -69,7 +68,13 @@ class ScheduleJobSerializer(serializers.Serializer):
     executor = serializers.CharField(default='default')
     next_run_time = serializers.DateTimeField(read_only=True)
 
-    def validate_func(self, value):
+    def validate_actor_name(self, value):
+        """
+        Get actor name and return path to actor for apscheduler
+        example: value = 'print_result', return 'mytasks.tasks:print_result'
+        :param value:
+        :return:
+        """
         declared_actors = get_declared_actors()
         if value not in declared_actors:
             raise serializers.ValidationError('Unknown actor name')
