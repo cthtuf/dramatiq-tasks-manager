@@ -3,6 +3,7 @@ setup.py
 dramatiq_tasks_manager/__init__.py
 dramatiq_tasks_manager/apps.py
 dramatiq_tasks_manager/middleware.py
+dramatiq_tasks_manager/permissions.py
 dramatiq_tasks_manager/scheduler.py
 dramatiq_tasks_manager/serializers.py
 dramatiq_tasks_manager/tests.py
@@ -16,4 +17,5 @@ dramatiq_tasks_manager.egg-info/requires.txt
 dramatiq_tasks_manager.egg-info/top_level.txt
 dramatiq_tasks_manager/management/__init__.py
 dramatiq_tasks_manager/management/commands/__init__.py
+dramatiq_tasks_manager/management/commands/createtestuser.py
 dramatiq_tasks_manager/management/commands/rundramatiq.py
