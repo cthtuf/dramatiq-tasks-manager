@@ -11,7 +11,7 @@ class ExecuteTaskSerializer(serializers.Serializer):
     kwargs = serializers.JSONField(required=False, write_only=True)
     message_id = serializers.UUIDField(required=False, read_only=True)
 
-    def validate_name(self, value):
+    def validate_actor_name(self, value):
         if value not in get_declared_actors():
             raise serializers.ValidationError('Unknown actor name')
 
