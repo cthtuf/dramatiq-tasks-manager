@@ -32,7 +32,10 @@ class ScheduleJobsListCreateView(CreateAPIView):
     permission_classes = (TaskSchedulePermission, )
 
     def get_serializer_class(self):
-        trigger = self.request.data.get('trigger')
+        data = self.request.data
+        if not data or not isinstance(data, dict):
+            raise ValidationError("Unexpected data payload")
+        trigger = data.get('trigger')
         if trigger == ScheduleJobSerializer.TRIGGER_DATE:
             return ScheduleJobDateSerializer
         elif trigger == ScheduleJobSerializer.TRIGGER_INTERVAL:
