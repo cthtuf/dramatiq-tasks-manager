@@ -19,3 +19,5 @@ dramatiq_tasks_manager/management/__init__.py
 dramatiq_tasks_manager/management/commands/__init__.py
 dramatiq_tasks_manager/management/commands/createtestuser.py
 dramatiq_tasks_manager/management/commands/rundramatiq.py
+dramatiq_tasks_manager/migrations/0001_create_access_groups.py
+dramatiq_tasks_manager/migrations/__init__.py

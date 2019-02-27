@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: dramatiq-tasks-manager
-Version: 0.0.6
+Version: 0.0.7
 Summary: This package provides API interface for executing and scheduling tasks. It depends on dramatiq and apscheduler
 Home-page: https://github.com/cthtuf/dramatiq-tasks-manager
 Author: cthtuf
