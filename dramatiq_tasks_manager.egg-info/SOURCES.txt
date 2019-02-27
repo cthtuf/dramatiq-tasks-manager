@@ -6,6 +6,7 @@ dramatiq_tasks_manager/middleware.py
 dramatiq_tasks_manager/permissions.py
 dramatiq_tasks_manager/scheduler.py
 dramatiq_tasks_manager/serializers.py
+dramatiq_tasks_manager/settings.py
 dramatiq_tasks_manager/tests.py
 dramatiq_tasks_manager/urls.py
 dramatiq_tasks_manager/utils.py
