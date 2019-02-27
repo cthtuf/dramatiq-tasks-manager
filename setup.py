@@ -2,9 +2,12 @@ from setuptools import setup
 
 setup(
     name='dramatiq-tasks-manager',
-    version='0.0.6',
-    packages=['dramatiq_tasks_manager', 'dramatiq_tasks_manager.management',
-              'dramatiq_tasks_manager.management.commands'],
+    version='0.0.8',
+    packages=['dramatiq_tasks_manager',
+              'dramatiq_tasks_manager.management',
+              'dramatiq_tasks_manager.management.commands',
+              'dramatiq_tasks_manager.migrations',
+              ],
     url='https://github.com/cthtuf/dramatiq-tasks-manager',
     license='MIT',
     author='cthtuf',

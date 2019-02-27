@@ -1,6 +1,6 @@
-from django.conf import settings
-
 from apscheduler.schedulers.background import BackgroundScheduler
+
+from .settings import APSCHEDULER_SETTINGS
 
 
 class Scheduler(BackgroundScheduler):
@@ -12,6 +12,6 @@ class Scheduler(BackgroundScheduler):
 
     def __new__(cls):
         if not isinstance(cls._instance, BackgroundScheduler):
-            cls._instance = BackgroundScheduler(settings.APSCHEDULER_SETTINGS)
+            cls._instance = BackgroundScheduler(APSCHEDULER_SETTINGS)
             cls._instance.start()
         return cls._instance

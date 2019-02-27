@@ -1,22 +1,22 @@
 from time import sleep
 
-from django.conf import settings
-
 import pika
 import redis
 from django_dramatiq.management.commands import rundramatiq
 from pika.exceptions import ConnectionClosed as PikaConnectionClosed
 from pika.exceptions import IncompatibleProtocolError
 
+from dramatiq_tasks_manager.settings import RABBIT_HOST, REDIS_HOST, REDIS_ACTORS_LIST_HASH
+
 
 class Command(rundramatiq.Command):
     def check_connection_to_rabbit(self):
         try:
-            if settings.RABBIT_HOST:
+            if RABBIT_HOST:
                 connection_attempts = 10
                 while connection_attempts > 0:
                     try:
-                        conn = pika.BlockingConnection(pika.ConnectionParameters(settings.RABBIT_HOST, 5672, '/'))
+                        pika.BlockingConnection(pika.ConnectionParameters(RABBIT_HOST, 5672, '/'))
                         self.stdout.write(' * Rabbit is ready')
                         return
                     except (PikaConnectionClosed, IncompatibleProtocolError):
@@ -31,11 +31,11 @@ class Command(rundramatiq.Command):
 
     def check_connection_to_redis(self):
         try:
-            if settings.REDIS_HOST:
+            if REDIS_HOST:
                 connection_attempts = 10
                 while connection_attempts > 0:
                     try:
-                        rs = redis.Redis(settings.REDIS_HOST)
+                        rs = redis.Redis(REDIS_HOST)
                         rs.client_list()
                         self.stdout.write(' * Redis is ready')
                         return
@@ -61,8 +61,8 @@ class Command(rundramatiq.Command):
     def flush_actors_list(self):
         self.stdout.write(' * Trying to flush actors list')
         try:
-            redis_obj = redis.Redis(host=settings.REDIS_HOST)
-            redis_obj.delete(settings.REDIS_ACTORS_LIST_HASH)
+            redis_obj = redis.Redis(host=REDIS_HOST)
+            redis_obj.delete(REDIS_ACTORS_LIST_HASH)
         except Exception as e:
             self.stdout.write(f' ! Exception on flush actors list e={e}')
         else:
