@@ -1,13 +1,12 @@
 import logging
 from functools import lru_cache
-
-from django.conf import settings
+from typing import Union
 
 from apscheduler.util import ref_to_obj as getactorfunc_by_path
 from dramatiq.actor import Actor
 from redis import Redis
 
-from typing import Union
+from .settings import REDIS_ACTORS_LIST_HASH, REDIS_HOST
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +19,9 @@ def get_declared_actors() -> list:
     :return:
     """
     try:
-        redis_obj = Redis(host=settings.REDIS_HOST, decode_responses=True)
-        return redis_obj.hkeys(settings.REDIS_ACTORS_LIST_HASH)
+        # ToDo: make redis instance as singletone
+        redis_obj = Redis(host=REDIS_HOST, decode_responses=True)
+        return redis_obj.hkeys(REDIS_ACTORS_LIST_HASH)
     except Exception:
         logger.exception('Cant get declared actors')
         return []
@@ -35,8 +35,8 @@ def get_actor_apschedulerpath_by_name(actor_name: str) -> Union[str, None]:
     :return:
     """
     try:
-        redis_obj = Redis(host=settings.REDIS_HOST, decode_responses=True)
-        return redis_obj.hget(settings.REDIS_ACTORS_LIST_HASH, actor_name)
+        redis_obj = Redis(host=REDIS_HOST, decode_responses=True)
+        return redis_obj.hget(REDIS_ACTORS_LIST_HASH, actor_name)
     except Exception:
         logger.exception('Cant get actor data')
         return None
