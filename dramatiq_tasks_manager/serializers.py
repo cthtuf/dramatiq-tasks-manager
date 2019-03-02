@@ -40,14 +40,22 @@ class TaskListSerializer(serializers.ModelSerializer):
 
 class TaskDetailSerializer(serializers.ModelSerializer):
     message = serializers.SerializerMethodField()
+    result = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
-        fields = ('id', 'status', 'created_at', 'updated_at', 'message')
+        fields = ('id', 'status', 'created_at', 'updated_at', 'message', 'result')
 
     def get_message(self, obj):
         message = getattr(obj, 'message', None)
         return message.asdict() if message else None
+
+    def get_result(self, obj):
+        message = getattr(obj, 'message', None)
+        try:
+            return message.get_result() if message else None
+        except Exception:
+            return None
 
 
 class ScheduleJobSerializer(serializers.Serializer):
