@@ -7,9 +7,10 @@ from .utils import get_actor_apschedulerpath_by_name, get_declared_actors, getac
 
 
 class ExecuteTaskSerializer(serializers.Serializer):
-    actor_name = serializers.CharField(max_length=255)
-    kwargs = serializers.JSONField(required=False, write_only=True)
-    message_id = serializers.UUIDField(required=False, read_only=True)
+    actor_name = serializers.CharField(max_length=255, help_text="The name of actor which should be executed")
+    kwargs = serializers.JSONField(required=False, write_only=True, help_text="Params which should be passed to actor")
+    message_id = serializers.UUIDField(required=False, read_only=True,
+                                       help_text="ID of message on successfull execution")
 
     def validate_actor_name(self, value):
         if value not in get_declared_actors():
@@ -65,16 +66,17 @@ class ScheduleJobSerializer(serializers.Serializer):
     TRIGGER_CRON = 'cron'
     AVAILABLE_TRIGGERS = (TRIGGER_DATE, TRIGGER_INTERVAL, TRIGGER_CRON, )
 
-    actor_name = serializers.CharField(source='func')
-    args = serializers.ListField(default=None)
-    kwargs = serializers.DictField(default=None)
+    actor_name = serializers.CharField(source='func', help_text="The name of actor which should be scheduled")
+    args = serializers.ListField(default=None, help_text="The list of positional arguments for the actor")
+    kwargs = serializers.DictField(default=None, help_text="The dict of keyword arguments for the actor")
     misfire_grace_time = serializers.IntegerField(default=None)
     coalesce = serializers.BooleanField(default=None)
     max_instances = serializers.IntegerField(default=1, min_value=1)
     replace_existing = serializers.BooleanField(default=False)
     id = serializers.CharField(default=None, required=False)
     executor = serializers.CharField(default='default')
-    next_run_time = serializers.DateTimeField(read_only=True)
+    next_run_time = serializers.DateTimeField(read_only=True, help_text="Closest time when the task will be tried "
+                                                                        "to execute")
 
     def validate_actor_name(self, value):
         """
@@ -104,7 +106,7 @@ class ScheduleJobSerializer(serializers.Serializer):
 class ScheduleJobDateSerializer(ScheduleJobSerializer):
     TRIGGER = 'date'
 
-    run_date = serializers.DateTimeField(write_only=True)
+    run_date = serializers.DateTimeField(write_only=True, help_text="When task should be executed")
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
