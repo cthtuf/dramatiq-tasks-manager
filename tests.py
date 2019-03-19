@@ -11,7 +11,6 @@ from .permissions import GROUP_TASK_EXECUTORS, GROUP_TASK_REPORTERS, GROUP_TASK_
 
 
 class ValidationErrorMessages(Enum):
-        unknown_trigger = 'Unknown trigger'
         field_required = 'This field is required'
         unknown_actor = 'Unknown actor name'
 
@@ -154,65 +153,48 @@ class TasksTestCase(APITestCase):
 
     def test_schedule_permissions(self):
         self.assertTrue(self.login(self.user_wo_groups_data))
-        response = self.post('task_schedule')
+        response = self.post('schedule_task_by_date')
         self.assertEqual(403, response.status_code)
 
         # User with group reporter
         self.assertTrue(self.login(self.user_reporter_data))
-        response = self.post('task_schedule')
+        response = self.post('schedule_task_by_date')
         self.assertEqual(403, response.status_code)
 
         # User with group executor
         self.assertTrue(self.login(self.user_executor_data))
-        response = self.post('task_schedule')
+        response = self.post('schedule_task_by_date')
         self.assertEqual(403, response.status_code)
 
     def test_schedule_disallowed_methods(self):
         # User with group scheduler
         self.assertTrue(self.login(self.user_scheduler_data))
         # Check for incorrect request methods
-        response = self.get('task_schedule')
+        response = self.get('schedule_task_by_date')
         self.assertEqual(405, response.status_code)
-        response = self.put('task_schedule')
+        response = self.put('schedule_task_by_date')
         self.assertEqual(405, response.status_code)
-        response = self.patch('task_schedule')
+        response = self.patch('schedule_task_by_date')
         self.assertEqual(405, response.status_code)
 
     def test_schedule_task(self):
         # User with group scheduler
         self.assertTrue(self.login(self.user_scheduler_data))
         # Request wo data
-        response = self.post('task_schedule')
+        response = self.post('schedule_task_by_date')
         self.assertEqual(400, response.status_code)
-
-        # Request witout trigger
-        execute_request_data = {
-            "actor_name": "some_actor"
-        }
-        response = self.post('task_schedule', data=execute_request_data)
-        self.assertContains(response, ValidationErrorMessages.unknown_trigger.value, status_code=400)
 
         # Request without run_date for date trigger
         execute_request_data = {
             "actor_name": "some_actor",
-            "trigger": "date",
         }
-        response = self.post('task_schedule', data=execute_request_data)
+        response = self.post('schedule_task_by_date', data=execute_request_data)
         self.assertContains(response, ValidationErrorMessages.field_required.value, status_code=400)
 
         # Request with unknown actor for date trigger
         execute_request_data = {
             "actor_name": "some_actor",
-            "trigger": "date",
             "run_date": datetime.now().isoformat()
         }
-        response = self.post('task_schedule', data=execute_request_data)
-        self.assertContains(response, ValidationErrorMessages.unknown_actor.value, status_code=400)
-
-        # Request without date data for interval trigger
-        execute_request_data = {
-            "actor_name": "some_actor",
-            "trigger": "interval",
-        }
-        response = self.post('task_schedule', execute_request_data)
+        response = self.post('schedule_task_by_date', data=execute_request_data)
         self.assertContains(response, ValidationErrorMessages.unknown_actor.value, status_code=400)
