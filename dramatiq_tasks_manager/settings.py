@@ -7,12 +7,13 @@ REDIS_ACTORS_LIST_HASH = getattr(settings, 'REDIS_ACTORS_LIST_HASH', 'dramatiqac
 POSTGRESQL_HOST = getattr(settings, 'POSTRESQL_HOST', 'postgres')
 RABBIT_HOST = getattr(settings, 'RABBIT_HOST', 'rabbit')
 TIME_ZONE = getattr(settings, 'TIME_ZONE', 'UTC')
+APSCHEDULER_JOBSTORE_DATABASE = getattr(settings, 'APSCHEDULER_JOBSTORE_DATABASE', 'scheduler')
 
 APSCHEDULER_DEFAULT_SETTINGS = {
     # Store all scheduled tasks in postgresql database
     'apscheduler.jobstores.default': {
         'type': 'sqlalchemy',
-        'url': f'postgresql+psycopg2://postgres:postgres@{POSTGRESQL_HOST}/scheduler'
+        'url': f'postgresql+psycopg2://postgres:postgres@{POSTGRESQL_HOST}/{APSCHEDULER_JOBSTORE_DATABASE}'
     },
     'apscheduler.executors.default': {
         'class': 'apscheduler_dramatiq_executor.executor:DramatiqExecutor',

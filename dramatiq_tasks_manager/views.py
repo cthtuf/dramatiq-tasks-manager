@@ -1,4 +1,3 @@
-from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 
 from django_dramatiq.models import Task
@@ -6,21 +5,30 @@ from django_dramatiq.models import Task
 from .permissions import TaskExecutePermission, TaskSchedulePermission
 from .serializers import (
     ExecuteTaskSerializer, ScheduleJobCronSerializer, ScheduleJobDateSerializer, ScheduleJobIntervalSerializer,
-    ScheduleJobSerializer, TaskDetailSerializer, TaskListSerializer)
-
+    TaskDetailSerializer, TaskListSerializer, ScheduleListSerializer)
+from .scheduler import Scheduler
 
 class ExecuteTaskView(CreateAPIView):
+    """
+    Execute an actor with given params
+    """
     permission_classes = (TaskExecutePermission, )
     serializer_class = ExecuteTaskSerializer
 
 
 class ExecutedListTaskView(ListAPIView):
+    """
+    The list of executed tasks
+    """
     permission_classes = (TaskExecutePermission,)
     serializer_class = TaskListSerializer
     queryset = Task.tasks.all()
 
 
-class ExecuteDetailTaskView(RetrieveAPIView):
+class ExecutedDetailTaskView(RetrieveAPIView):
+    """
+    Details of executed task
+    """
     permission_classes = (TaskExecutePermission, )
     serializer_class = TaskDetailSerializer
     queryset = Task.tasks.all()
@@ -28,19 +36,36 @@ class ExecuteDetailTaskView(RetrieveAPIView):
     lookup_url_kwarg = 'id'
 
 
-class ScheduleJobsListCreateView(CreateAPIView):
+class ScheduleJobByDateView(CreateAPIView):
+    """
+    Schedule task in the certain date
+    """
     permission_classes = (TaskSchedulePermission, )
+    serializer_class = ScheduleJobDateSerializer
 
-    def get_serializer_class(self):
-        data = self.request.data
-        if not data or not isinstance(data, dict):
-            raise ValidationError("Unexpected data payload")
-        trigger = data.get('trigger')
-        if trigger == ScheduleJobSerializer.TRIGGER_DATE:
-            return ScheduleJobDateSerializer
-        elif trigger == ScheduleJobSerializer.TRIGGER_INTERVAL:
-            return ScheduleJobIntervalSerializer
-        elif trigger == ScheduleJobSerializer.TRIGGER_CRON:
-            return ScheduleJobCronSerializer
-        else:
-            raise ValidationError(f"Unknown trigger. Should be one of {ScheduleJobSerializer.AVAILABLE_TRIGGERS}")
+
+class ScheduleJobByIntervalView(CreateAPIView):
+    """
+    Schedule task to execute in certain interval of time. E.g. every 10 minutes
+    """
+    permission_classes = (TaskSchedulePermission, )
+    serializer_class = ScheduleJobIntervalSerializer
+
+
+class ScheduleJobByCronView(CreateAPIView):
+    """
+    Advanced schedule method. Provides the power of cron to customize execution time and period
+    """
+    permission_classes = (TaskSchedulePermission, )
+    serializer_class = ScheduleJobCronSerializer
+
+
+class ScheduledListView(ListAPIView):
+    """
+    List of scheduled tasks
+    """
+    permission_classes = (TaskSchedulePermission,)
+    serializer_class = ScheduleListSerializer
+
+    def get_queryset(self):
+        return Scheduler().get_jobs()
