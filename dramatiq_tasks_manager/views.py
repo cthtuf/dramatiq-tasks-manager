@@ -1,4 +1,3 @@
-from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 
 from django_dramatiq.models import Task
@@ -6,8 +5,8 @@ from django_dramatiq.models import Task
 from .permissions import TaskExecutePermission, TaskSchedulePermission
 from .serializers import (
     ExecuteTaskSerializer, ScheduleJobCronSerializer, ScheduleJobDateSerializer, ScheduleJobIntervalSerializer,
-    TaskDetailSerializer, TaskListSerializer)
-
+    TaskDetailSerializer, TaskListSerializer, ScheduleListSerializer)
+from .scheduler import Scheduler
 
 class ExecuteTaskView(CreateAPIView):
     """
@@ -59,3 +58,14 @@ class ScheduleJobByCronView(CreateAPIView):
     """
     permission_classes = (TaskSchedulePermission, )
     serializer_class = ScheduleJobCronSerializer
+
+
+class ScheduledListView(ListAPIView):
+    """
+    List of scheduled tasks
+    """
+    permission_classes = (TaskSchedulePermission,)
+    serializer_class = ScheduleListSerializer
+
+    def get_queryset(self):
+        return Scheduler().get_jobs()

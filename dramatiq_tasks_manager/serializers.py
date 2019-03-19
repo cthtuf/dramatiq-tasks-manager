@@ -177,3 +177,7 @@ class ScheduleJobCronSerializer(ScheduleJobSerializer):
         ret['second'] = str(instance.trigger.fields[fieldname_map['second']])
 
         return ret
+
+
+class ScheduleListSerializer(ScheduleJobSerializer):
+    trigger = serializers.CharField()

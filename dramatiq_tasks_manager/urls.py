@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import (ExecuteTaskView, ExecutedListTaskView, ExecutedDetailTaskView,
-                    ScheduleJobByDateView, ScheduleJobByIntervalView, ScheduleJobByCronView)
+                    ScheduleJobByDateView, ScheduleJobByIntervalView, ScheduleJobByCronView, ScheduledListView)
 
 urlpatterns = [
     path('execute', ExecuteTaskView.as_view(), name='task_execute'),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('schedule/by_date', ScheduleJobByDateView.as_view(), name="schedule_task_by_date"),
     path('schedule/by_interval', ScheduleJobByIntervalView.as_view(), name="schedule_task_by_interval"),
     path('schedule/by_cron', ScheduleJobByCronView.as_view(), name="schedule_task_by_cron"),
+    path('scheduled', ScheduledListView.as_view(), name="scheduled_list"),
 ]
